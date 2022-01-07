@@ -71,7 +71,7 @@ jobs:
           -a "repo=${{ github.repository }}" \
           -a "workflow=${{ github.workflow }}" \
           -a "ref=${{ github.sha }}" \
-          ghcr.io/kyverno/kyvernopre@sha256:${{ steps.get-step.outputs.digest }}
+          ghcr.io/namanl2001/kyvernopre@sha256:${{ steps.get-step.outputs.digest }}
 
   release-kyverno:
     runs-on: ubuntu-latest
@@ -152,8 +152,8 @@ jobs:
           -a "repo=${{ github.repository }}" \
           -a "workflow=${{ github.workflow }}" \
           -a "ref=${{ github.sha }}" \
-          ghcr.io/kyverno/kyverno@sha256:${{ steps.get-step.outputs.digest }}
-          cosign attach sbom -sbom ./*-bom.cdx.json -type cyclonedx ghcr.io/kyverno/sbom:latest
+          ghcr.io/namanl2001/kyverno@sha256:${{ steps.get-step.outputs.digest }}
+          cosign attach sbom -sbom ./*-bom.cdx.json -type cyclonedx ghcr.io/namanl2001/sbom:latest
 
       - name: Trivy Scan Image
         uses: aquasecurity/trivy-action@master
@@ -231,7 +231,7 @@ jobs:
           -a "repo=${{ github.repository }}" \
           -a "workflow=${{ github.workflow }}" \
           -a "ref=${{ github.sha }}" \
-          ghcr.io/kyverno/kyverno-cli@sha256:${{ steps.get-step.outputs.digest }}
+          ghcr.io/namanl2001/kyverno-cli@sha256:${{ steps.get-step.outputs.digest }}
   
   create-release:
     runs-on: ubuntu-latest
