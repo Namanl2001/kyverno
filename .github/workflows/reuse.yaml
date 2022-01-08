@@ -34,6 +34,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Unshallow
+        run: git fetch --prune --unshallow
+
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
@@ -52,11 +55,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
 
-      - name: Set up Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.16
-      - uses: creekorful/goreportcard-action@v1.0
+      - name: Refresh Go report card
+        if: ${{ inputs.tag == 'release'}}
+        uses: creekorful/goreportcard-action@v1.0
 
       - name: Log into ghcr.io
         uses: docker/login-action@master
