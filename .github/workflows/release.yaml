@@ -4,18 +4,22 @@ on:
     tags:
       - 'v*'
 jobs:
+  buildx:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: Namanl2001/kyverno/.github/workflows/reuse.yaml@va.b.c
+        secrets:
+          registry_username: ${{ github.actor }}
+          registry_password: ${{ secrets.CR_PAT }}
+
   release-init-kyverno:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
       id-token: write
-    uses: Namanl2001/kyverno/.github/workflows/reuse.yaml@va.b.c
-    secrets:
-      registry_username: ${{ github.actor }}
-      registry_password: ${{ secrets.CR_PAT }}
+    needs: buildx
     steps:
-
       - name :  docker images publish
         run: |
           make docker-publish-initContainer
