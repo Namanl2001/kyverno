@@ -1,8 +1,8 @@
 name: image
 on:
   push:
-    branches:
-      - 'main'
+    tags:
+      - 'v*'
 
 jobs:
   push-init-kyverno:
