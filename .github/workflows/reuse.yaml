@@ -34,10 +34,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Unshallow
-        if: ${{ inputs.tag == 'image'}}
-        run: git fetch --prune --unshallow
-
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
