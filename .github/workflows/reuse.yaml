@@ -6,7 +6,7 @@ on:
       publish_command:
         required: true
         type: string
-      digest_ccommand: 
+      digest_command: 
         required: true
         type: string
       image_name: 
