@@ -3,9 +3,17 @@ name: Create Publish And Sign Docker Image
 on:
   workflow_call:
     inputs:
-      publish:
+      publish_command:
+        required: true
         type: string
-      digest: 
+      digest_ccommand: 
+        required: true
+        type: string
+      image_name: 
+        required: true
+        type: string
+      tag: 
+        required: true
         type: string
     secrets:
       registry_username:
@@ -54,8 +62,8 @@ jobs:
         uses: docker/login-action@master
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.CR_PAT }}
+          username: ${{secrets.registry_username}}
+          password: ${{secrets.registry_password}}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
@@ -65,16 +73,33 @@ jobs:
 
       - name: Set version
         run: |
-          echo "KYVERNO_VERSION=$(git describe --match "v[0-9]*")"
+          echo "KYVERNO_VERSION=$(git describe --match "v[0-9]*")" >> $GITHUB_ENV
 
-      - name :  docker images publish
-        run: |
-          make ${{inputs.publish}}
+      - name: Generate SBOM JSON
+        if: ${{ ${{inputs.image_name}} == 'kyverno' && ${{inputs.tag}} == 'release'}}
+        uses: CycloneDX/gh-gomod-generate-sbom@v1
+        with:
+          version: v1
+          args: mod -licenses -json -output kyverno-${{ env.KYVERNO_VERSION }}-bom.cdx.json
+          
+      - name: Upload SBOM JSON
+        if: ${{ ${{inputs.image_name}} == 'kyverno' && ${{inputs.tag}} == 'release'}}
+        uses: actions/upload-artifact@v2
+        with:
+          name: kyverno-bom-cdx
+          path: kyverno-v*-bom.cdx.json
+
+      - name : Docker images publish
+        run: make ${{inputs.publish_command}}
+      
+      - name : Docker sbom publish
+        if: ${{ ${{inputs.image_name}} == 'kyverno' && ${{inputs.tag}} == 'release'}}
+        run: make docker-publish-sbom
 
       - name: get digest
         id: get-step
         run: |
-          echo "::set-output name=digest::$(make ${{inputs.digest}})"
+          echo "::set-output name=digest::$(make ${{inputs.digest_command}})"
 
       - name: Sign image
         env:
@@ -84,4 +109,18 @@ jobs:
           -a "repo=${{ github.repository }}" \
           -a "workflow=${{ github.workflow }}" \
           -a "ref=${{ github.sha }}" \
-          ghcr.io/namanl2001/kyvernopre@sha256:${{ steps.get-step.outputs.digest }}
+          ghcr.io/namanl2001/${{inputs.image_name}}@sha256:${{ steps.get-step.outputs.digest }}
+
+      - name : Sign SBOM
+        if: ${{ ${{inputs.image_name}} == 'kyverno' && ${{inputs.tag}} == 'release'}}
+        run: cosign attach sbom --sbom ./*-bom.cdx.json --type cyclonedx ghcr.io/namanl2001/sbom:latest
+
+      - name: Trivy Scan Image
+        uses: aquasecurity/trivy-action@master
+        with: 
+          image-ref: 'ghcr.io/namanl2001/${{inputs.image_name}}:${{env.KYVERNO_VERSION}}'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'

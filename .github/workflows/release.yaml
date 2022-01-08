@@ -7,175 +7,35 @@ jobs:
   release-init-kyverno:
     uses: Namanl2001/kyverno/.github/workflows/reuse.yaml@va.b.c
     with:
-      publish: docker-publish-initContainer
-      digest: docker-get-initContainer-digest
+      publish_command: docker-publish-initContainer
+      digest_command: docker-get-initContainer-digest
+      image_name: kyvernopre
+      tag: release
     secrets:
       registry_username: ${{ github.actor }}
       registry_password: ${{ secrets.CR_PAT }}
 
   release-kyverno:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-      id-token: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Set up Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.16
-
-      - name: Install Cosign
-        uses: sigstore/cosign-installer@main
-        with:
-          cosign-release: 'v1.4.1'
-
-      - name: Cache Go modules
-        uses: actions/cache@v1
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-
-      - name: Set up Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.16
-      - uses: creekorful/goreportcard-action@v1.0
-
-      - name: login to GitHub Container Registry
-        run: echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-        id: buildx
-        with:
-          install: true
-
-      - name: Set version
-        run: |
-          echo "KYVERNO_VERSION=$(git describe --match "v[0-9]*")"
-          echo "KYVERNO_VERSION=$(git describe --match "v[0-9]*")" >> $GITHUB_ENV
-
-      - name: Generate SBOM JSON
-        uses: CycloneDX/gh-gomod-generate-sbom@v1
-        with:
-          version: v1
-          args: mod -licenses -json -output kyverno-${{ env.KYVERNO_VERSION }}-bom.cdx.json
-          
-      - uses: actions/upload-artifact@v2
-        with:
-          name: kyverno-bom-cdx
-          path: kyverno-v*-bom.cdx.json
-
-      - name :  docker images publish
-        run: |
-          make docker-publish-sbom
-          make docker-publish-kyverno
-
-      - name: get digest
-        id: get-step
-        run: |
-          echo "::set-output name=digest::$(make docker-get-kyverno-digest)"
-
-      - name: Sign image and SBOM
-        env:
-          COSIGN_EXPERIMENTAL: "true"
-        run: |
-          cosign sign \
-          -a "repo=${{ github.repository }}" \
-          -a "workflow=${{ github.workflow }}" \
-          -a "ref=${{ github.sha }}" \
-          ghcr.io/namanl2001/kyverno@sha256:${{ steps.get-step.outputs.digest }}
-          cosign attach sbom --sbom ./*-bom.cdx.json --type cyclonedx ghcr.io/namanl2001/sbom:latest
-
-      - name: Trivy Scan Image
-        uses: aquasecurity/trivy-action@master
-        with: 
-          image-ref: 'ghcr.io/namanl2001/kyverno:${{env.KYVERNO_VERSION}}'
-          format: 'table'
-          exit-code: '1'
-          ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
+    uses: Namanl2001/kyverno/.github/workflows/reuse.yaml@va.b.c
+    with:
+      publish_command: docker-publish-kyverno
+      digest_command: docker-get-kyverno-digest
+      image_name: kyverno
+      tag: release
+    secrets:
+      registry_username: ${{ github.actor }}
+      registry_password: ${{ secrets.CR_PAT }}
 
   release-kyverno-cli:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-      id-token: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Set up Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.16
-
-      - name: Install Cosign
-        uses: sigstore/cosign-installer@main
-        with:
-          cosign-release: 'v1.4.1'
-
-      - name: Cache Go modules
-        uses: actions/cache@v1
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-
-      - name: Set up Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.16
-      - uses: creekorful/goreportcard-action@v1.0
-
-      - name: Log into ghcr.io
-        uses: docker/login-action@master
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.CR_PAT }}
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-        id: buildx
-        with:
-          install: true
-
-      - name: Set version
-        run: |
-          echo "KYVERNO_VERSION=$(git describe --match "v[0-9]*")"
-
-      - name :  docker images publish
-        run: |
-          make docker-publish-cli
-
-      - name: get digest
-        id: get-step
-        run: |
-          echo "::set-output name=digest::$(make docker-get-cli-digest)"
-
-      - name: Sign image
-        env:
-          COSIGN_EXPERIMENTAL: "true"
-        run: |
-          cosign sign \
-          -a "repo=${{ github.repository }}" \
-          -a "workflow=${{ github.workflow }}" \
-          -a "ref=${{ github.sha }}" \
-          ghcr.io/namanl2001/kyverno-cli@sha256:${{ steps.get-step.outputs.digest }}
+    uses: Namanl2001/kyverno/.github/workflows/reuse.yaml@va.b.c
+    with:
+      publish_command: docker-publish-cli
+      digest_command: docker-get-cli-digest
+      image_name: kyverno-cli
+      tag: release
+    secrets:
+      registry_username: ${{ github.actor }}
+      registry_password: ${{ secrets.CR_PAT }}
   
   create-release:
     runs-on: ubuntu-latest
