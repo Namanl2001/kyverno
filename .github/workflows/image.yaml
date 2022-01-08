@@ -12,7 +12,7 @@ jobs:
       packages: write
       id-token: write
     steps:
-      - name: Checkout
+      - name: Checkout kre
         uses: actions/checkout@v2
 
       - name: Unshallow
