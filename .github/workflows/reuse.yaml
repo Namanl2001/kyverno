@@ -54,8 +54,8 @@ jobs:
         uses: docker/login-action@master
         with:
           registry: ghcr.io
-          username: ${{secrets.registry_username}}
-          password: ${{secrets.registry_password}}
+          username: ${{ github.actor }}
+          password: ${{ secrets.CR_PAT }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
