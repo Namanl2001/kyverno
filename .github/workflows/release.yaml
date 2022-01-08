@@ -5,7 +5,6 @@ on:
       - 'v*'
 jobs:
   buildx:
-    runs-on: ubuntu-latest
     uses: Namanl2001/kyverno/.github/workflows/reuse.yaml@va.b.c
     secrets:
       registry_username: ${{ github.actor }}
