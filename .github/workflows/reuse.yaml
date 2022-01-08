@@ -76,14 +76,14 @@ jobs:
           echo "KYVERNO_VERSION=$(git describe --match "v[0-9]*")" >> $GITHUB_ENV
 
       - name: Generate SBOM JSON
-        if: ${{ ${{inputs.image_name}} == 'kyverno' && ${{inputs.tag}} == 'release'}}
+        if: ${{ inputs.image_name == 'kyverno' && inputs.tag == 'release'}}
         uses: CycloneDX/gh-gomod-generate-sbom@v1
         with:
           version: v1
           args: mod -licenses -json -output kyverno-${{ env.KYVERNO_VERSION }}-bom.cdx.json
           
       - name: Upload SBOM JSON
-        if: ${{ ${{inputs.image_name}} == 'kyverno' && ${{inputs.tag}} == 'release'}}
+        if: ${{ inputs.image_name == 'kyverno' && inputs.tag == 'release'}}
         uses: actions/upload-artifact@v2
         with:
           name: kyverno-bom-cdx
@@ -93,7 +93,7 @@ jobs:
         run: make ${{inputs.publish_command}}
       
       - name : Docker sbom publish
-        if: ${{ ${{inputs.image_name}} == 'kyverno' && ${{inputs.tag}} == 'release'}}
+        if: ${{ inputs.image_name == 'kyverno' && inputs.tag == 'release'}}
         run: make docker-publish-sbom
 
       - name: get digest
@@ -112,7 +112,7 @@ jobs:
           ghcr.io/namanl2001/${{inputs.image_name}}@sha256:${{ steps.get-step.outputs.digest }}
 
       - name : Sign SBOM
-        if: ${{ ${{inputs.image_name}} == 'kyverno' && ${{inputs.tag}} == 'release'}}
+        if: ${{ inputs.image_name == 'kyverno' && inputs.tag == 'release'}}
         run: cosign attach sbom --sbom ./*-bom.cdx.json --type cyclonedx ghcr.io/namanl2001/sbom:latest
 
       - name: Trivy Scan Image
