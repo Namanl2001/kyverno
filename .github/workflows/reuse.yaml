@@ -1,4 +1,4 @@
-name: Create Publish And Sign Docker Image
+name: Create Publish and Sign Docker Image
 
 on:
   workflow_call:
