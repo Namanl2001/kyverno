@@ -121,7 +121,7 @@ jobs:
 
       - name : Sign SBOM
         if: ${{ inputs.image_name == 'kyverno' && inputs.tag == 'release'}}
-        run: cosign attach sbom --sbom ./*-bom.cdx.json --type cyclonedx ghcr.io/namanl2001/sbom:latest
+        run: cosign attach sbom -sbom ./*-bom.cdx.json -type cyclonedx  ghcr.io/namanl2001/kyverno:${{env.KYVERNO_VERSION}}@${{ steps.push-step.outputs.digest }}
 
       - name: Trivy Scan Image
         if: ${{ inputs.tag == 'release'}}
