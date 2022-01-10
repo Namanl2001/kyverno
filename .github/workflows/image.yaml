@@ -6,7 +6,7 @@ on:
 
 jobs:
   push-init-kyverno:
-    uses: Namanl2001/kyverno/.github/workflows/reuse.yaml@v1.5.9
+    uses: Namanl2001/kyverno/.github/workflows/reuse.yaml@v1.5.8
     with:
       publish_command: docker-publish-initContainer-dev
       digest_command: docker-get-initContainer-dev-digest
@@ -17,7 +17,7 @@ jobs:
       registry_password: ${{ secrets.CR_PAT }}
 
   push-kyverno:
-    uses: Namanl2001/kyverno/.github/workflows/reuse.yaml@v1.5.9
+    uses: Namanl2001/kyverno/.github/workflows/reuse.yaml@v1.5.8
     with:
       publish_command: docker-publish-kyverno-dev
       digest_command: docker-get-kyverno-dev-digest
@@ -28,7 +28,7 @@ jobs:
       registry_password: ${{ secrets.CR_PAT }}
 
   push-kyverno-cli:
-    uses: Namanl2001/kyverno/.github/workflows/reuse.yaml@v1.5.9
+    uses: Namanl2001/kyverno/.github/workflows/reuse.yaml@v1.5.8
     with:
       publish_command: docker-publish-cli-dev
       digest_command: docker-get-cli-dev-digest
