@@ -78,10 +78,11 @@ jobs:
         with:
           install: true
 
-      - name: Set version
+      - name: Set env
         if: ${{ inputs.tag == 'release'}}
         run: |
           echo "KYVERNO_VERSION=$(git describe --match "v[0-9]*")" >> $GITHUB_ENV
+          echo "COSIGN_REPOSITORY=ghcr.io/namanl2001/signatures" >> $GITHUB_ENV
 
       - name: Generate SBOM JSON
         if: ${{ inputs.image_name == 'kyverno' && inputs.tag == 'release'}}
@@ -108,19 +109,20 @@ jobs:
       - name: Sign image
         env:
           COSIGN_EXPERIMENTAL: "true"
-        run: |
-          echo "COSIGN_REPOSITORY=ghcr.io/namanl2001/signatures" >> $GITHUB_ENV
+        run: |          
           cosign sign \
           -a "repo=${{ github.repository }}" \
           -a "workflow=${{ github.workflow }}" \
           -a "ref=${{ github.sha }}" \
           ghcr.io/namanl2001/${{inputs.image_name}}@sha256:${{ steps.get-step.outputs.digest }}
 
+      - name: Set SBOM container
+        if: ${{ inputs.image_name == 'kyverno' && inputs.tag == 'release'}}
+        run: echo "COSIGN_REPOSITORY=ghcr.io/namanl2001/sbom" >> $GITHUB_ENV
+
       - name : Sign SBOM
         if: ${{ inputs.image_name == 'kyverno' && inputs.tag == 'release'}}
-        run: |
-          echo "COSIGN_REPOSITORY=ghcr.io/namanl2001/sbom" >> $GITHUB_ENV
-          cosign attach sbom --sbom ./*-bom.cdx.json --type cyclonedx  ghcr.io/namanl2001/kyverno:${{env.KYVERNO_VERSION}}
+        run: cosign attach sbom --sbom ./*-bom.cdx.json --type cyclonedx  ghcr.io/namanl2001/kyverno:${{env.KYVERNO_VERSION}}
 
       - name: Trivy Scan Image
         if: ${{ inputs.tag == 'release'}}
