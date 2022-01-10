@@ -81,7 +81,7 @@ jobs:
       - name: Set env
         if: ${{ inputs.tag == 'release'}}
         run: |
-          echo "KYVERNO_VERSION=$(git describe --match "v[0-9]*")" >> $GITHUB_ENV
+          echo "KYVERNO_VERSION=$(git tag --list --sort=-version:refname "v[0-9]*" | head -n 1)" >> $GITHUB_ENV
           echo "COSIGN_REPOSITORY=ghcr.io/namanl2001/signatures" >> $GITHUB_ENV
 
       - name: Generate SBOM JSON
