@@ -78,11 +78,10 @@ jobs:
         with:
           install: true
 
-      - name: Set env
+      - name: Set Version
         if: ${{ inputs.tag == 'release'}}
         run: |
           echo "KYVERNO_VERSION=$(git tag --list --sort=-version:refname "v[0-9]*" | head -n 1)" >> $GITHUB_ENV
-          echo "COSIGN_REPOSITORY=ghcr.io/namanl2001/signatures" >> $GITHUB_ENV
 
       - name: Generate SBOM JSON
         if: ${{ inputs.image_name == 'kyverno' && inputs.tag == 'release'}}
@@ -100,6 +99,9 @@ jobs:
 
       - name : Docker images publish
         run: make ${{inputs.publish_command}}
+
+      - name: Set Signatures container
+        run: echo "COSIGN_REPOSITORY=ghcr.io/namanl2001/signatures" >> $GITHUB_ENV
 
       - name: get digest
         id: get-step
