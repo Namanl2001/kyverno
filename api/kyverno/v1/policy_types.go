@@ -461,6 +461,10 @@ type Validation struct {
 	// Deny defines conditions used to pass or fail a validation rule.
 	// +optional
 	Deny *Deny `json:"deny,omitempty" yaml:"deny,omitempty"`
+
+	// Signatures allow verifying a YAML has been signed by one or more signatures.
+	// +optional
+	Signatures []string `json:"signatures,omitempty" yaml:"signatures,omitempty"`
 }
 
 // Deny specifies a list of conditions used to pass or fail a validation rule.
