@@ -15,6 +15,9 @@ on:
       tag: 
         required: true
         type: string
+      main: 
+        required: true
+        type: string
     secrets:
       registry_username:
         required: true
@@ -61,10 +64,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
 
-      - name: Refresh Go report card
-        if: ${{ inputs.tag == 'release'}}
-        uses: creekorful/goreportcard-action@v1.0
-
       - name: Log into ghcr.io
         uses: docker/login-action@master
         with:
@@ -88,7 +87,7 @@ jobs:
         uses: CycloneDX/gh-gomod-generate-sbom@v1
         with:
           version: v1
-          args: mod -licenses -json -output ${{inputs.image_name}}-${{ env.KYVERNO_VERSION }}-bom.cdx.json
+          args: app -licenses -json -output ${{inputs.image_name}}-${{ env.KYVERNO_VERSION }}-bom.cdx.json -main ${{inputs.main}}
           
       - name: Upload SBOM JSON
         if: ${{inputs.tag == 'release'}}
@@ -123,7 +122,7 @@ jobs:
         run: cosign attach sbom --sbom ./${{inputs.image_name}}-v*-bom.cdx.json --type cyclonedx  ghcr.io/namanl2001/${{inputs.image_name}}@sha256:${{ steps.get-step.outputs.digest }}
 
       - name: Trivy Scan Image
-        if: ${{ inputs.tag == 'release'}}
+        if: ${{inputs.tag == 'release'}}
         uses: aquasecurity/trivy-action@master
         with: 
           image-ref: 'ghcr.io/namanl2001/${{inputs.image_name}}@sha256:${{ steps.get-step.outputs.digest }}'
