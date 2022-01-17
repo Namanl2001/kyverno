@@ -91,7 +91,7 @@ jobs:
           args: mod -licenses -json -output ${{inputs.image_name}}-${{ env.KYVERNO_VERSION }}-bom.cdx.json
           
       - name: Upload SBOM JSON
-        if: ${{ inputs.image_name == 'kyverno' && inputs.tag == 'release'}}
+        if: ${{inputs.tag == 'release'}}
         uses: actions/upload-artifact@v2
         with:
           name: ${{inputs.image_name}}-bom-cdx
