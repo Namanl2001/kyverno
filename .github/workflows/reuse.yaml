@@ -15,8 +15,7 @@ on:
       tag: 
         required: true
         type: string
-      main: 
-        required: true
+      main:
         type: string
     secrets:
       registry_username:
