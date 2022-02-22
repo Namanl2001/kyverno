@@ -105,9 +105,20 @@ jobs:
         with:
           name: ${{inputs.image_name}}-bom-cdx
           path: ${{inputs.image_name}}-v*-bom.cdx.json
+      
+      - name: Extract branch name
+        if: ${{inputs.tag == 'image'}}
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
 
       - name : Docker images publish
+        if: ${{inputs.tag == 'release' || steps.extract_branch.outputs.branch == 'release*'}}
         run: make ${{inputs.publish_command}}
+
+      - name : Docker images publish
+        if: ${{steps.extract_branch.outputs.branch == 'main'}}
+        run: make ${{inputs.publish_command}}-dev
 
       - name: get digest
         id: get-step
@@ -117,16 +128,16 @@ jobs:
       - name: Sign image
         env:
           COSIGN_EXPERIMENTAL: "true"
-          COSIGN_REPOSITORY: "ghcr.io/kyverno/signatures"
+          COSIGN_REPOSITORY: "ghcr.io/namanl2001/signatures"
         run: |          
           cosign sign \
           -a "repo=${{ github.repository }}" \
           -a "workflow=${{ github.workflow }}" \
           -a "ref=${{ github.sha }}" \
-          ghcr.io/kyverno/${{inputs.image_name}}@sha256:${{ steps.get-step.outputs.digest }}
+          ghcr.io/namanl2001/${{inputs.image_name}}@sha256:${{ steps.get-step.outputs.digest }}
 
       - name : Attach SBOM
         if: ${{inputs.tag == 'release'}}
         env:
-          COSIGN_REPOSITORY: "ghcr.io/kyverno/sbom"
-        run: cosign attach sbom --sbom ./${{inputs.image_name}}-v*-bom.cdx.json --type cyclonedx  ghcr.io/kyverno/${{inputs.image_name}}@sha256:${{ steps.get-step.outputs.digest }}
+          COSIGN_REPOSITORY: "ghcr.io/namanl2001/sbom"
+        run: cosign attach sbom --sbom ./${{inputs.image_name}}-v*-bom.cdx.json --type cyclonedx  ghcr.io/namanl2001/${{inputs.image_name}}@sha256:${{ steps.get-step.outputs.digest }}
