@@ -78,7 +78,7 @@ jobs:
 
       - name: Run Trivy vulnerability scanner in repo mode
         if: ${{inputs.tag == 'release'}}
-        uses: aquasecurity/trivy-action@8f4c7160b470bafe4299efdc1c8a1fb495f8325a # v0.2.1
+        uses: aquasecurity/trivy-action@v0.2.2
         with: 
           scan-type: 'fs'
           format: 'table'
@@ -113,11 +113,11 @@ jobs:
         id: extract_branch
 
       - name : Docker images publish
-        if: ${{inputs.tag == 'release' || steps.extract_branch.outputs.branch == 'release*'}}
+        if: ${{inputs.tag == 'release' || (inputs.tag == 'image' && steps.extract_branch.outputs.branch == 'release*')}}
         run: make ${{inputs.publish_command}}
 
       - name : Docker images publish
-        if: ${{steps.extract_branch.outputs.branch == 'main'}}
+        if: ${{inputs.tag == 'image' && steps.extract_branch.outputs.branch == 'main'}}
         run: make ${{inputs.publish_command}}-dev
 
       - name: get digest
