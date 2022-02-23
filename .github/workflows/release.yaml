@@ -6,6 +6,10 @@ on:
 
 jobs:
   release-init-kyverno:
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
     uses: Namanl2001/kyverno/.github/workflows/reuse.yaml@v1.6.9
     with:
       publish_command: docker-publish-initContainer
@@ -18,6 +22,10 @@ jobs:
       registry_password: ${{ secrets.CR_PAT }}
 
   release-kyverno:
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
     uses: Namanl2001/kyverno/.github/workflows/reuse.yaml@v1.6.9
     with:
       publish_command: docker-publish-kyverno
@@ -30,6 +38,10 @@ jobs:
       registry_password: ${{ secrets.CR_PAT }}
 
   release-kyverno-cli:
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
     uses: Namanl2001/kyverno/.github/workflows/reuse.yaml@v1.6.9
     with:
       publish_command: docker-publish-cli
