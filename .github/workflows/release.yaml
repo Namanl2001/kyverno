@@ -4,11 +4,6 @@ on:
     tags:
       - 'v*'
 
-permissions:
-  contents: read
-  packages: write
-  id-token: write 
-
 jobs:
   release-init-kyverno:
     uses: Namanl2001/kyverno/.github/workflows/reuse.yaml@v1.6.9
