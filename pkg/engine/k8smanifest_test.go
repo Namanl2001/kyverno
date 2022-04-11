@@ -21,6 +21,7 @@ var signed_resource = `{
 		"name": "nginx"
 	},
 	"spec": {
+		"terminationGracePeriodSeconds": "10s",
 		"containers": [
 			{
 				"image": "nginx:1.14.2",
@@ -42,6 +43,6 @@ func Test_VerifyManifest(t *testing.T) {
 
 	verified, diff, err := VerifyManifest(policyContext, ecdsaPub, ignoreFields)
 	assert.NilError(t, err)
-	assert.Equal(t, verified, true)
+	assert.Equal(t, verified, false)
 	assert.Equal(t, diff, diffVar)
 }
