@@ -468,14 +468,6 @@ type Validation struct {
 	// +optional
 	Message string `json:"message,omitempty" yaml:"message,omitempty"`
 
-	// Key is the PEM encoded public key that the yaml manifest is signed with.
-	// +optional
-	Key string `json:"key,omitempty" yaml:"key,omitempty"`
-
-	// Fields which will be ignored while comparing manifests.
-	// +optional
-	IgnoreFields k8smanifest.ObjectFieldBindingList `json:"ignoreFields,omitempty" yaml:"ignoreFields,omitempty"`
-
 	// ForEach applies policy rule changes to nested elements.
 	// +optional
 	ForEachValidation []*ForEachValidation `json:"foreach,omitempty" yaml:"foreach,omitempty"`
@@ -494,6 +486,24 @@ type Validation struct {
 	// Deny defines conditions used to pass or fail a validation rule.
 	// +optional
 	Deny *Deny `json:"deny,omitempty" yaml:"deny,omitempty"`
+
+	// Manifests is used to validate signed manifests.
+	// +optional
+	Manifests *Manifests `json:"manifests,omitempty" yaml:"manifests,omitempty"`
+}
+
+type Manifests struct {
+	// Key is the PEM encoded public key that the yaml manifest is signed with.
+	// +optional
+	Key string `json:"key,omitempty" yaml:"key,omitempty"`
+
+	// Fields which will be ignored while comparing manifests.
+	// +optional
+	IgnoreFields k8smanifest.ObjectFieldBindingList `json:"ignoreFields,omitempty" yaml:"ignoreFields,omitempty"`
+
+	// DryRun is used to determine whether to run dryRun check or not.
+	// +optional
+	DryRun *bool `json:"dryRun,omitempty" yaml:"dryRun,omitempty"`
 }
 
 // Deny specifies a list of conditions used to pass or fail a validation rule.

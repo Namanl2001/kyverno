@@ -162,6 +162,7 @@ type validator struct {
 	deny             *kyverno.Deny
 	key              string
 	ignoreFields     k8smanifest.ObjectFieldBindingList
+	dryRun           *bool
 }
 
 func newValidator(log logr.Logger, ctx *PolicyContext, rule *kyverno.Rule) *validator {
@@ -175,8 +176,9 @@ func newValidator(log logr.Logger, ctx *PolicyContext, rule *kyverno.Rule) *vali
 		pattern:          ruleCopy.Validation.Pattern,
 		anyPattern:       ruleCopy.Validation.AnyPattern,
 		deny:             ruleCopy.Validation.Deny,
-		key:              ruleCopy.Validation.Key,
-		ignoreFields:     ruleCopy.Validation.IgnoreFields,
+		key:              ruleCopy.Validation.Manifests.Key,
+		ignoreFields:     ruleCopy.Validation.Manifests.IgnoreFields,
+		dryRun:           ruleCopy.Validation.Manifests.DryRun,
 	}
 }
 
@@ -389,7 +391,7 @@ func (v *validator) validateKey() *response.RuleResponse {
 	operation, err := v.ctx.JSONContext.Query("request.operation")
 	// there is no need to check image signatures during a delete request.
 	if err == nil && operation != "DELETE" {
-		verified, diff, err := VerifyManifest(v.ctx, v.key, v.ignoreFields)
+		verified, diff, err := VerifyManifest(v.ctx, v.key, v.ignoreFields, v.dryRun)
 		if err != nil {
 			return ruleError(v.rule, utils.Validation, "manifest verification failed", err)
 		}

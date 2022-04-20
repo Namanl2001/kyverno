@@ -63,11 +63,11 @@ func (v *Validate) Validate() (string, error) {
 func (v *Validate) validateElements() error {
 	count := validationElemCount(v.rule)
 	if count == 0 {
-		return fmt.Errorf("one of pattern, anyPattern, deny, foreach, key must be specified")
+		return fmt.Errorf("one of pattern, anyPattern, deny, foreach, manifests must be specified")
 	}
 
 	if count > 1 {
-		return fmt.Errorf("only one of pattern, anyPattern, deny, foreach, key can be specified")
+		return fmt.Errorf("only one of pattern, anyPattern, deny, foreach, manifests can be specified")
 	}
 
 	return nil
@@ -95,7 +95,7 @@ func validationElemCount(v *kyverno.Validation) int {
 		count++
 	}
 
-	if v.Key != "" {
+	if v.Manifests != nil {
 		count++
 	}
 

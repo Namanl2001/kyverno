@@ -41,7 +41,8 @@ func Test_VerifyManifest(t *testing.T) {
 	var diffVar *mapnode.DiffResult
 	ignoreFields := k8smanifest.ObjectFieldBindingList{}
 
-	verified, diff, err := VerifyManifest(policyContext, ecdsaPub, ignoreFields)
+	dry := false
+	verified, diff, err := VerifyManifest(policyContext, ecdsaPub, ignoreFields, &dry)
 	assert.NilError(t, err)
 	assert.Equal(t, verified, false)
 	assert.Equal(t, diff, diffVar)

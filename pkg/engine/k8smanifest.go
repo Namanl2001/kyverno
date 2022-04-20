@@ -33,7 +33,7 @@ const defaultDryRunNamespace = "kyverno"
 //go:embed resources/default-config.yaml
 var defaultConfigBytes []byte
 
-func VerifyManifest(policyContext *PolicyContext, ecdsaPub string, ignoreFields k8smanifest.ObjectFieldBindingList) (bool, *mapnode.DiffResult, error) {
+func VerifyManifest(policyContext *PolicyContext, ecdsaPub string, ignoreFields k8smanifest.ObjectFieldBindingList, dryRun *bool) (bool, *mapnode.DiffResult, error) {
 	request, err := policyContext.JSONContext.Query("request")
 	if err != nil {
 		return false, nil, err
@@ -104,10 +104,16 @@ func VerifyManifest(policyContext *PolicyContext, ecdsaPub string, ignoreFields 
 		}
 	}
 
+	// default to true
+	if dryRun == nil {
+		dry := true
+		dryRun = &dry
+	}
+
 	var mnfMatched bool
 	var diff *mapnode.DiffResult
 	var diffsForAllCandidates []*mapnode.DiffResult
-	cndMatched, tmpDiff, err := matchResourceWithManifest(obj, foundManifest, ignore, "", true)
+	cndMatched, tmpDiff, err := matchResourceWithManifest(obj, foundManifest, ignore, "", dryRun, true)
 	if err != nil {
 		return false, nil, fmt.Errorf("error occurred during matching manifest: %v", err)
 	}
@@ -132,7 +138,7 @@ func VerifyManifest(policyContext *PolicyContext, ecdsaPub string, ignoreFields 
 	return verified, diff, nil
 }
 
-func matchResourceWithManifest(obj unstructured.Unstructured, foundManifestBytes []byte, ignoreFields []string, dryRunNamespace string, checkDryRunForApply bool) (bool, *mapnode.DiffResult, error) {
+func matchResourceWithManifest(obj unstructured.Unstructured, foundManifestBytes []byte, ignoreFields []string, dryRunNamespace string, checkDryRunForCreate *bool, checkDryRunForApply bool) (bool, *mapnode.DiffResult, error) {
 
 	apiVersion := obj.GetAPIVersion()
 	kind := obj.GetKind()
@@ -174,21 +180,23 @@ func matchResourceWithManifest(obj unstructured.Unstructured, foundManifestBytes
 	}
 
 	// CASE2: dryrun create match
-	fmt.Println("dryrun create matching")
-	log.Debug("try dryrun create matching")
-	matched, diff, err = dryrunCreateMatch(objBytes, foundManifestBytes, clusterScope, isCRD, dryRunNamespace)
-	if err != nil {
-		return false, nil, errors.Wrap(err, "error occured during dryrun create match")
-	}
-	if diff != nil && len(ignoreFields) > 0 {
-		_, diff, _ = diff.Filter(ignoreFields)
-	}
-	if diff == nil || diff.Size() == 0 {
-		matched = true
-		diff = nil
-	}
-	if matched {
-		return true, nil, nil
+	if *checkDryRunForCreate {
+		fmt.Println("dryrun create matching")
+		log.Debug("try dryrun create matching")
+		matched, diff, err = dryrunCreateMatch(objBytes, foundManifestBytes, clusterScope, isCRD, dryRunNamespace)
+		if err != nil {
+			return false, nil, errors.Wrap(err, "error occured during dryrun create match")
+		}
+		if diff != nil && len(ignoreFields) > 0 {
+			_, diff, _ = diff.Filter(ignoreFields)
+		}
+		if diff == nil || diff.Size() == 0 {
+			matched = true
+			diff = nil
+		}
+		if matched {
+			return true, nil, nil
+		}
 	}
 
 	// CASE3: dryrun apply match
@@ -322,48 +330,6 @@ func getTime(tstamp *int64) *time.Time {
 	}
 	t := time.Unix(*tstamp, 0)
 	return &t
-}
-
-func matchManifest(inputManifestBytes, foundManifestBytes []byte, ignoreFields []string) (bool, *mapnode.DiffResult, error) {
-	log.Debug("manifest:", string(inputManifestBytes))
-	log.Debug("manifest in reference:", string(foundManifestBytes))
-	inputFileNode, err := mapnode.NewFromYamlBytes(inputManifestBytes)
-	if err != nil {
-		return false, nil, err
-	}
-	mask := "metadata.annotations." + DefaultAnnotationKeyDomain
-	annotationMask := []string{
-		mask + "message",
-		mask + "signature",
-		mask + "certificate",
-		mask + "message",
-		mask + "bundle",
-	}
-	maskedInputNode := inputFileNode.Mask(annotationMask)
-
-	var obj unstructured.Unstructured
-	err = yaml.Unmarshal(inputManifestBytes, &obj)
-	if err != nil {
-		return false, nil, err
-	}
-
-	manifestNode, err := mapnode.NewFromYamlBytes(foundManifestBytes)
-	if err != nil {
-		return false, nil, err
-	}
-	maskedManifestNode := manifestNode.Mask(annotationMask)
-	var matched bool
-	diff := maskedInputNode.Diff(maskedManifestNode)
-
-	// filter out ignoreFields
-	if diff != nil && len(ignoreFields) > 0 {
-		_, diff, _ = diff.Filter(ignoreFields)
-	}
-	if diff == nil || diff.Size() == 0 {
-		matched = true
-		diff = nil
-	}
-	return matched, diff, nil
 }
 
 func addConfig(vo, defaultConfig *k8smanifest.VerifyResourceOption) *k8smanifest.VerifyResourceOption {

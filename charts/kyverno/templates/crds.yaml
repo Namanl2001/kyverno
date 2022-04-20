@@ -1202,34 +1202,41 @@ spec:
                                 x-kubernetes-preserve-unknown-fields: true
                             type: object
                           type: array
-                        ignoreFields:
-                          description: Fields which will be ignored while comparing manifests.
-                          items:
-                            properties:
-                              fields:
-                                items:
-                                  type: string
-                                type: array
-                              objects:
-                                items:
-                                  properties:
-                                    group:
+                        manifests:
+                          description: Manifests is used to validate signed manifests.
+                          properties:
+                            dryRun:
+                              description: DryRun is used to determine whether to run dryRun check or not.
+                              type: boolean
+                            ignoreFields:
+                              description: Fields which will be ignored while comparing manifests.
+                              items:
+                                properties:
+                                  fields:
+                                    items:
                                       type: string
-                                    kind:
-                                      type: string
-                                    name:
-                                      type: string
-                                    namespace:
-                                      type: string
-                                    version:
-                                      type: string
-                                  type: object
-                                type: array
-                            type: object
-                          type: array
-                        key:
-                          description: Key is the PEM encoded public key that the yaml manifest is signed with.
-                          type: string
+                                    type: array
+                                  objects:
+                                    items:
+                                      properties:
+                                        group:
+                                          type: string
+                                        kind:
+                                          type: string
+                                        name:
+                                          type: string
+                                        namespace:
+                                          type: string
+                                        version:
+                                          type: string
+                                      type: object
+                                    type: array
+                                type: object
+                              type: array
+                            key:
+                              description: Key is the PEM encoded public key that the yaml manifest is signed with.
+                              type: string
+                          type: object
                         message:
                           description: Message specifies a custom message to be displayed on failure.
                           type: string
@@ -3772,34 +3779,41 @@ spec:
                                 x-kubernetes-preserve-unknown-fields: true
                             type: object
                           type: array
-                        ignoreFields:
-                          description: Fields which will be ignored while comparing manifests.
-                          items:
-                            properties:
-                              fields:
-                                items:
-                                  type: string
-                                type: array
-                              objects:
-                                items:
-                                  properties:
-                                    group:
+                        manifests:
+                          description: Manifests is used to validate signed manifests.
+                          properties:
+                            dryRun:
+                              description: DryRun is used to determine whether to run dryRun check or not.
+                              type: boolean
+                            ignoreFields:
+                              description: Fields which will be ignored while comparing manifests.
+                              items:
+                                properties:
+                                  fields:
+                                    items:
                                       type: string
-                                    kind:
-                                      type: string
-                                    name:
-                                      type: string
-                                    namespace:
-                                      type: string
-                                    version:
-                                      type: string
-                                  type: object
-                                type: array
-                            type: object
-                          type: array
-                        key:
-                          description: Key is the PEM encoded public key that the yaml manifest is signed with.
-                          type: string
+                                    type: array
+                                  objects:
+                                    items:
+                                      properties:
+                                        group:
+                                          type: string
+                                        kind:
+                                          type: string
+                                        name:
+                                          type: string
+                                        namespace:
+                                          type: string
+                                        version:
+                                          type: string
+                                      type: object
+                                    type: array
+                                type: object
+                              type: array
+                            key:
+                              description: Key is the PEM encoded public key that the yaml manifest is signed with.
+                              type: string
+                          type: object
                         message:
                           description: Message specifies a custom message to be displayed on failure.
                           type: string
