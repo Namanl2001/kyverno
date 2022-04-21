@@ -1940,7 +1940,7 @@ spec:
                           properties:
                             dryRun:
                               description: DryRun is used to determine whether to
-                                run dryRun check or not.
+                                run dryRun check or not. defaults to false.
                               type: boolean
                             ignoreFields:
                               description: Fields which will be ignored while comparing
@@ -5717,7 +5717,7 @@ spec:
                           properties:
                             dryRun:
                               description: DryRun is used to determine whether to
-                                run dryRun check or not.
+                                run dryRun check or not. defaults to false.
                               type: boolean
                             ignoreFields:
                               description: Fields which will be ignored while comparing
@@ -7993,7 +7993,7 @@ spec:
               fieldPath: metadata.namespace
         - name: KYVERNO_SVC
           value: kyverno-svc
-        image: ghcr.io/kyverno/kyverno:1.7-dev-latest
+        image: ghcr.io/kyverno/kyverno:latest
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 2

@@ -162,7 +162,7 @@ type validator struct {
 	deny             *kyverno.Deny
 	key              string
 	ignoreFields     k8smanifest.ObjectFieldBindingList
-	dryRun           *bool
+	dryRun           bool
 }
 
 func newValidator(log logr.Logger, ctx *PolicyContext, rule *kyverno.Rule) *validator {

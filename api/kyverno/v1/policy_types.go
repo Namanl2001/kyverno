@@ -501,9 +501,9 @@ type Manifests struct {
 	// +optional
 	IgnoreFields k8smanifest.ObjectFieldBindingList `json:"ignoreFields,omitempty" yaml:"ignoreFields,omitempty"`
 
-	// DryRun is used to determine whether to run dryRun check or not.
+	// DryRun is used to determine whether to run dryRun check or not. defaults to false.
 	// +optional
-	DryRun *bool `json:"dryRun,omitempty" yaml:"dryRun,omitempty"`
+	DryRun bool `json:"dryRun,omitempty" yaml:"dryRun,omitempty"`
 }
 
 // Deny specifies a list of conditions used to pass or fail a validation rule.

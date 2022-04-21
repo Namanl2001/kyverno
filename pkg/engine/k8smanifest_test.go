@@ -42,7 +42,7 @@ func Test_VerifyManifest(t *testing.T) {
 	ignoreFields := k8smanifest.ObjectFieldBindingList{}
 
 	dry := false
-	verified, diff, err := VerifyManifest(policyContext, ecdsaPub, ignoreFields, &dry)
+	verified, diff, err := VerifyManifest(policyContext, ecdsaPub, ignoreFields, dry)
 	assert.NilError(t, err)
 	assert.Equal(t, verified, false)
 	assert.Equal(t, diff, diffVar)

@@ -5,6 +5,7 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.4.0
     config.kubernetes.io/index: '1'
+    internal.config.kubernetes.io/index: '1'
   creationTimestamp: null
   labels:
     app.kubernetes.io/component: kyverno
@@ -1206,7 +1207,7 @@ spec:
                           description: Manifests is used to validate signed manifests.
                           properties:
                             dryRun:
-                              description: DryRun is used to determine whether to run dryRun check or not.
+                              description: DryRun is used to determine whether to run dryRun check or not. defaults to false.
                               type: boolean
                             ignoreFields:
                               description: Fields which will be ignored while comparing manifests.
@@ -1417,6 +1418,7 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.4.0
     config.kubernetes.io/index: '2'
+    internal.config.kubernetes.io/index: '2'
   creationTimestamp: null
   labels:
     app.kubernetes.io/component: kyverno
@@ -1909,6 +1911,7 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.4.0
     config.kubernetes.io/index: '3'
+    internal.config.kubernetes.io/index: '3'
   creationTimestamp: null
   labels:
     app.kubernetes.io/component: kyverno
@@ -2401,6 +2404,7 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.4.0
     config.kubernetes.io/index: '4'
+    internal.config.kubernetes.io/index: '4'
   creationTimestamp: null
   labels:
     app.kubernetes.io/component: kyverno
@@ -2582,6 +2586,7 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.4.0
     config.kubernetes.io/index: '5'
+    internal.config.kubernetes.io/index: '5'
   creationTimestamp: null
   labels:
     app.kubernetes.io/component: kyverno
@@ -3783,7 +3788,7 @@ spec:
                           description: Manifests is used to validate signed manifests.
                           properties:
                             dryRun:
-                              description: DryRun is used to determine whether to run dryRun check or not.
+                              description: DryRun is used to determine whether to run dryRun check or not. defaults to false.
                               type: boolean
                             ignoreFields:
                               description: Fields which will be ignored while comparing manifests.
@@ -3994,6 +3999,7 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.4.0
     config.kubernetes.io/index: '6'
+    internal.config.kubernetes.io/index: '6'
   creationTimestamp: null
   labels:
     app.kubernetes.io/component: kyverno
@@ -4486,6 +4492,7 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.4.0
     config.kubernetes.io/index: '7'
+    internal.config.kubernetes.io/index: '7'
   creationTimestamp: null
   labels:
     app.kubernetes.io/component: kyverno
